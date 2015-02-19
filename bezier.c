@@ -5,7 +5,7 @@
 
 
 
-#define POINT_RADIUS    4
+#define POINT_RADIUS    2
 
 
 
@@ -74,12 +74,19 @@ void create(window_main *wm)
 	gtk_widget_show_all(wm->window_main);
 }
 
-void draw_point(cairo_t* c, double x, double y)
+void draw_point(cairo_t* c, double x, double y, int point_state)
 {
 	cairo_arc(c, x, y, POINT_RADIUS, 0, 2*M_PI);
-	cairo_set_source_rgb(c, 1, 1, 1); 
+
+	if (point_state == 1) {
+		cairo_set_source_rgb(c, 0, 0, 0);
+	}
+	else {
+		cairo_set_source_rgb(c, 1, 1, 1);
+	}
+
 	cairo_fill_preserve(c);
-	cairo_set_source_rgb(c, 0, 0, 0);
+	cairo_set_source_rgb(c, 0, 0, 0); 
 	cairo_stroke(c);
 }
 
@@ -109,14 +116,18 @@ void draw_points(window_main *wm, cairo_t *c)
 		}
 	}
 
+	int point_index = 0;
+
 	for (GList *iter = g_list_first(wm->points);
 			iter != NULL;
-			iter = g_list_next(iter))
+			iter = g_list_next(iter),
+			++point_index)
 	{
 		draw_point(c,
 			((point*) iter->data)->x,
-			((point*) iter->data)->y);
-
+			((point*) iter->data)->y,
+			point_index % 3);
+#if 0
 		cairo_move_to(c,
 			((point*) iter->data)->x - 10,
 			((point*) iter->data)->y - 5);
@@ -126,6 +137,7 @@ void draw_points(window_main *wm, cairo_t *c)
 
 		cairo_fill_preserve (c);
 		cairo_stroke (c);
+#endif
 	}
 }
 
