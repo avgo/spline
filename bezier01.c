@@ -16,11 +16,11 @@ typedef struct window_main_ window_main;
 
 
 
-gboolean drawing_area_button_press_event(GtkWidget *widget,
+static gboolean drawing_area_button_press_event(GtkWidget *widget,
                GdkEventButton *event, window_main *wm);
-gboolean drawing_area_button_release_event(GtkWidget *widget,
+static gboolean drawing_area_button_release_event(GtkWidget *widget,
                GdkEventButton *event, window_main *wm);
-gboolean drawing_area_motion_notify_event(GtkWidget *widget,
+static gboolean drawing_area_motion_notify_event(GtkWidget *widget,
                GdkEventButton *event,
                window_main *wm);
 static gboolean expose_event(GtkWidget* widget, GdkEventExpose* event, window_main *wm);
@@ -56,21 +56,21 @@ void create(window_main *wm)
 	gtk_widget_show_all(wm->window_main);
 }
 
-gboolean drawing_area_button_press_event(GtkWidget *widget,
+static gboolean drawing_area_button_press_event(GtkWidget *widget,
                GdkEventButton *event, window_main *wm)
 {
 	bezier_points_update(&wm->bez, event->x, event->y, 1);
 	gtk_widget_queue_draw(wm->drawing_area);
 }
 
-gboolean drawing_area_button_release_event(GtkWidget *widget,
+static gboolean drawing_area_button_release_event(GtkWidget *widget,
                GdkEventButton *event, window_main *wm)
 {
 	bezier_points_update(&wm->bez, event->x, event->y, 3);
 	gtk_widget_queue_draw(wm->drawing_area);
 }
 
-gboolean drawing_area_motion_notify_event(GtkWidget *widget,
+static gboolean drawing_area_motion_notify_event(GtkWidget *widget,
                GdkEventButton *event,
                window_main *wm)
 {

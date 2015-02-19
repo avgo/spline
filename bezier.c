@@ -7,12 +7,13 @@
 
 
 
-void bezier_draw_spline(cairo_t *c, point *p1, point *p2, point *p3, point *p4);
+static void bezier_draw_point(cairo_t* c, double x, double y, int point_state);
+static void bezier_draw_spline(cairo_t *c, point *p1, point *p2, point *p3, point *p4);
 
 
 
 
-void bezier_draw_point(cairo_t* c, double x, double y, int point_state)
+static void bezier_draw_point(cairo_t* c, double x, double y, int point_state)
 {
 	cairo_arc(c, x, y, POINT_RADIUS, 0, 2*M_PI);
 
@@ -193,7 +194,7 @@ void bezier_points_update(bezier *bez, double x, double y, int state)
 	}
 }
 
-void bezier_draw_spline(cairo_t *c, point *p1, point *p2, point *p3, point *p4)
+static void bezier_draw_spline(cairo_t *c, point *p1, point *p2, point *p3, point *p4)
 {
 	#define BEZIER(p1, p2, p3, p4, t) \
 		              (1 - t)*(1 - t)*(1 - t) * p1 \
