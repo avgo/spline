@@ -43,6 +43,7 @@ gboolean drawing_area_motion_notify_event(GtkWidget *widget,
                window_main *wm);
 void points_update(window_main *wm, double x, double y, int state);
 static gboolean expose_event(GtkWidget* widget, GdkEventExpose* event, window_main *wm);
+void spline_bezier_draw(cairo_t *c, point *p1, point *p2, point *p3, point *p4);
 void window_main_init(window_main *wm);
 
 
@@ -86,6 +87,27 @@ void draw_points(window_main *wm, cairo_t *c)
 {
 	char buf[10];
 	int index = 0;
+
+	GList *iter = g_list_first(wm->points); // p0
+
+	if (iter != NULL) {
+		iter = g_list_next(iter);
+
+		for (;;) {
+			point *p1, *p2, *p3, *p4;
+
+			p1 = iter->data; iter = g_list_next(iter);
+			p2 = iter->data; iter = g_list_next(iter);
+
+			if (iter == NULL)
+				break;
+
+			p3 = iter->data; iter = g_list_next(iter);
+			p4 = iter->data;
+
+			spline_bezier_draw(c, p1, p2, p3, p4);
+		}
+	}
 
 	for (GList *iter = g_list_first(wm->points);
 			iter != NULL;
@@ -270,6 +292,33 @@ void points_update(window_main *wm, double x, double y, int state)
 	}
 
 	gtk_widget_queue_draw(wm->drawing_area);
+}
+
+void spline_bezier_draw(cairo_t *c, point *p1, point *p2, point *p3, point *p4)
+{
+	#define BEZIER(p1, p2, p3, p4, t) \
+		              (1 - t)*(1 - t)*(1 - t) * p1 \
+		+ 3 * t     * (1 - t)*(1 - t)         * p2 \
+		+ 3 * t*t   * (1 - t)                 * p3 \
+		+     t*t*t                           * p4;
+
+	double y = BEZIER(p1->y, p2->y, p3->y, p4->y, 0);
+	double x = BEZIER(p1->x, p2->x, p3->x, p4->x, 0);
+
+	cairo_move_to(c, x, y);
+
+	for (int tt = 0; tt <= 100; ++tt) {
+		double t = 0.01 * tt;
+
+		y = BEZIER(p1->y, p2->y, p3->y, p4->y, t);
+		x = BEZIER(p1->x, p2->x, p3->x, p4->x, t);
+
+		cairo_line_to(c, x, y);
+	}
+
+	cairo_stroke(c);
+
+	#undef BEZIER
 }
 
 void window_main_init(window_main *wm)
